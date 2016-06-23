@@ -199,10 +199,6 @@ private:
     IplImage *prev_img;
     CvSeq* c;
     CvMemStorage* storage;
-
 };
 
-
-
-
-#endif // _FINDER_H_
+#endif
