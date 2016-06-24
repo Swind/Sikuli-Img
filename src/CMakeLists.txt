@@ -25,12 +25,13 @@ FIND_PACKAGE(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES(${OPENCV_INCLUDE_DIR})
 LINK_DIRECTORIES(${OpenCV_LIBRARY_DIR})
 
-FIND_PACKAGE(Tesseract REQUIRED)
-INCLUDE_DIRECTORIES(${Tesseract_INCLUDE_DIR})
-
 FIND_LIBRARY(TIFF_LIBS NAMES tiff)
 LIST(APPEND OpenCV_LIBS ${TIFF_LIBS})
 LINK_DIRECTORIES(${TIFF_LIB_DIR})
+
+FIND_PACKAGE(Tesseract REQUIRED)
+INCLUDE_DIRECTORIES(${Tesseract_INCLUDE_DIR})
+LINK_DIRECTORIES(${Tesseract_LIBRARY_DIR})
 
 SET(source_list
    TimingBlock.cc
@@ -45,7 +46,7 @@ SET(source_list
 ) 
 
 add_library(sikuli_img SHARED ${source_list} )
-target_link_libraries ( sikuli_img ${OpenCV_LIBS})
+target_link_libraries (sikuli_img ${OpenCV_LIBS} ${Tesseract_LIBRARY})
 
 ##########################################################
 #

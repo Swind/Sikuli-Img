@@ -4,7 +4,7 @@
 #include <boost/python.hpp>
 using namespace boost::python;
 
-BOOST_PYTHON_MODULE(sikuli)
+BOOST_PYTHON_MODULE(pysikuli_img)
 {
     class_<FindResult>("FindResult")
         .def(init<int, int, int, int, double>())
