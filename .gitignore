@@ -20,3 +20,4 @@ sikuli-script/src/main/java/com/apple/eawt
 sikuli-script/src/main/java/com/sun/awt
 .DS_Store
 *.pyc
+*.so

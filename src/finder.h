@@ -130,8 +130,10 @@ public:
     Finder(Mat mat);
     Finder(IplImage* source);
     Finder(const char* source);
+    Finder(const std::string& src, int len);
     ~Finder();
 
+    bool decode_base64(const std::string& src);
     void setROI(int x, int y, int w, int h);
 
     void find(IplImage* target, double min_similarity);
@@ -148,6 +150,9 @@ private:
     Mat _source;
     BaseFinder* _finder;
     Rect _roi;
+
+    std::vector<unsigned char> dst;
+    static const std::string table;
 };
 
 class FaceFinder : public BaseFinder

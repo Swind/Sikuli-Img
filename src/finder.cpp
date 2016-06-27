@@ -715,3 +715,77 @@ void Finder::setROI(int x, int y, int w, int h)
 {
     _roi = Rect(x, y, w, h);
 }
+
+Finder::Finder(const std::string& src, int len): dst(256) 
+{
+  this->decode_base64(src);  
+
+  _source = imdecode(dst, 1);
+  _finder = NULL;
+  _roi = Rect(-1,-1,-1,-1);
+}
+
+const std::string Finder::table =  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+bool Finder::decode_base64(const std::string& src){
+  std::vector<unsigned char> cdst;
+
+  if (src.size() & 0x00000003) {
+    return false;
+  } 
+  else {
+    for (std::size_t i = 0; i < src.size(); i += 4) {
+
+      if (src[i + 0] == '=') {
+        return false;
+      }
+      else if (src[i + 1] == '=') {
+        return false;
+      }
+      else if (src[i + 2] == '=') {
+        const std::string::size_type s1 = this->table.find(src[i + 0]);
+        const std::string::size_type s2 = this->table.find(src[i + 1]);
+
+        if (s1 == std::string::npos || s2 == std::string::npos) {
+          return false;
+        }
+
+        cdst.push_back(static_cast<unsigned char>(((s1 & 0x3F) << 2) | ((s2 & 0x30) >> 4)));
+
+        break;
+      }
+      else if (src[i + 3] == '=') {
+        const std::string::size_type s1 = this->table.find(src[i + 0]);
+        const std::string::size_type s2 = this->table.find(src[i + 1]);
+        const std::string::size_type s3 = this->table.find(src[i + 2]);
+
+        if (s1 == std::string::npos || s2 == std::string::npos || s3 == std::string::npos) {
+            return false;
+        }
+
+        cdst.push_back(static_cast<unsigned char>(((s1 & 0x3F) << 2) | ((s2 & 0x30) >> 4)));
+        cdst.push_back(static_cast<unsigned char>(((s2 & 0x0F) << 4) | ((s3 & 0x3C) >> 2)));
+
+        break;
+      }
+      else {
+          const std::string::size_type s1 = this->table.find(src[i + 0]);
+          const std::string::size_type s2 = this->table.find(src[i + 1]);
+          const std::string::size_type s3 = this->table.find(src[i + 2]);
+          const std::string::size_type s4 = this->table.find(src[i + 3]);
+
+          if (s1 == std::string::npos || s2 == std::string::npos || s3 == std::string::npos || s4 == std::string::npos) {
+              return false;
+          }
+
+          cdst.push_back(static_cast<unsigned char>(((s1 & 0x3F) << 2) | ((s2 & 0x30) >> 4)));
+          cdst.push_back(static_cast<unsigned char>(((s2 & 0x0F) << 4) | ((s3 & 0x3C) >> 2)));
+          cdst.push_back(static_cast<unsigned char>(((s3 & 0x03) << 6) | ((s4 & 0x3F) >> 0)));
+      }
+    }
+
+    this->dst.swap(cdst);
+
+    return true;
+  }
+}
