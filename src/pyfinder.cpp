@@ -20,6 +20,7 @@ BOOST_PYTHON_MODULE(pysikuli_img)
     void (Finder::*find_all_by_path)(const char*, double) = &Finder::find_all;
 
     class_<Finder>("Finder", init<const char*>())
+      .def(init<const std::string&, int>())
       .def("setROI", &Finder::setROI)
       .def("find", find_by_path)
       .def("find", find_all_by_path)
