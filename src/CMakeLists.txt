@@ -4,6 +4,7 @@ ENABLE_LANGUAGE(CXX)
 ENABLE_LANGUAGE(C)
 
 SET(CMAKE_CXX_FLAGS_RELEASE "-O1")
+SET(CMAKE_CXX_FLAGS "-fPIC")
 
 SET(CMAKE_VERBOSE_MAKEFILE 1)
 
@@ -48,19 +49,4 @@ SET(source_list
 add_library(sikuli_img SHARED ${source_list} )
 target_link_libraries (sikuli_img ${OpenCV_LIBS} ${Tesseract_LIBRARY})
 
-##########################################################
-#
-#
-# Sikuli Img Python Wrapper 
-#
-#
-##########################################################
-FIND_PACKAGE(PythonInterp)
-FIND_PACKAGE(PythonLibs)
-FIND_PACKAGE(Boost COMPONENTS python3)
-
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
-
-PYTHON_ADD_MODULE(pysikuli_img pyfinder.cpp)
-TARGET_LINK_LIBRARIES(pysikuli_img sikuli_img)
+ADD_SUBDIRECTORY(wrapper)
