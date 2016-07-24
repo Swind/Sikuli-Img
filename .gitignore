@@ -21,3 +21,4 @@ sikuli-script/src/main/java/com/sun/awt
 .DS_Store
 *.pyc
 *.so
+.idea
