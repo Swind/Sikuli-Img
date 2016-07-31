@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+from cv2img import Rect
+
 class FindResult:
     def __init__(self, x=0, y=0, w=0, h=0, score=-1):
         self.x = x
@@ -9,6 +11,16 @@ class FindResult:
         self.h = h
         self.score = score
 
+    def __str__(self):
+        return "x:{x}, y:{y}, w:{w}, h:{h}, score:{score}".format(
+            x=self.x,
+            y=self.y,
+            w=self.w,
+            h=self.h,
+            score=self.score
+        )
+
+
 class PyramidTemplateMatcher:
     def __init__(self, source_img, target_img, level, factor):
         self.source_img = source_img
@@ -16,8 +28,7 @@ class PyramidTemplateMatcher:
         self.factor = factor
         self.level = level
         self.lower_pyramid = None
-
-        self._has_matched_result = False
+        self.cache_result = None
 
         if self.source_img < self.target_img:
             return
@@ -47,15 +58,16 @@ class PyramidTemplateMatcher:
 
             result = cv2.matchTemplate(source_img.source,
                                        target_img.source,
-                                       cv2.CV_TM_SQDIFF_NORMED)
+                                       cv2.TM_SQDIFF_NORMED)
 
             result = np.ones(result.size(), np.float32) - result
         else:
             result = cv2.matchTemplate(source_img.source,
                                        target_img.source,
-                                       cv2.CV_TM_CCOEFF_NORMED)
+                                       cv2.TM_CCOEFF_NORMED)
 
-        minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
+        self.cache_result = result
+        minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(self.cache_result)
 
         return maxVal, maxLoc
 
@@ -63,7 +75,11 @@ class PyramidTemplateMatcher:
         x0 = max(x - x_margin, 0)
         y0 = max(y - y_margin, 0)
 
-        pass
+        rows, cols = self.cache_result.shape
+        x1 = min(x + x_margin, cols)
+        y1 = min(y + y_margin, rows)
+
+        self.cache_result[y0:y1, x0:x1] = 0
 
     def next(self):
 
@@ -76,22 +92,56 @@ class PyramidTemplateMatcher:
         detection_score = -1
         detection_loc = None
 
-        if not self._has_matched_result:
+        if self.cache_result is None:
             detection_score, detection_loc = self.find_best()
-            self._has_matched_result = True
         else:
-            _, detection_score, _, detection_loc = cv2.minMaxLoc(self.result)
+            _, detection_score, _, detection_loc = cv2.minMaxLoc(self.cache_result)
 
-        x_margin = self.target_img.cols / 3
-        y_margin = self.target_img.rows / 3
+        x_margin = int(self.target_img.cols / 3)
+        y_margin = int(self.target_img.rows / 3)
+        detection_x, detection_y = detection_loc
 
-        self.erase_result(detection_loc.x,
-                          detection_loc.y,
+        self.erase_result(detection_x,
+                          detection_y,
                           x_margin,
                           y_margin)
 
-        return FindResult(detection_loc.x,
-                          detection_loc.y,
+        return FindResult(detection_x,
+                          detection_y,
                           self.target_img.cols,
                           self.target_img.rows,
                           detection_score)
+
+    def _next_from_lower_pyramid(self):
+        match = self.lower_pyramid.next()
+
+        x = int(match.x * self.factor)
+        y = int(match.y * self.factor)
+
+        # Convert factor from float to int
+        factor = int(self.factor)
+
+        # Compute the parameter to define the neighborhood rectangle
+        x0 = max(x - factor, 0)
+        y0 = max(y - factor, 0)
+
+        x1 = min(x + self.target_img.cols + factor, self.source_img.cols)
+        y1 = min(y + self.target_img.rows + factor, self.source_img.rows)
+
+        roi = Rect(x0, y0, x1-x0, y1-y0)
+
+        detection_score, detection_loc = self.find_best(roi)
+
+        detection_x, detection_y = detection_loc
+        detection_x += roi.x
+        detection_y += roi.y
+
+        return FindResult(
+            detection_x,
+            detection_y,
+            self.target_img.cols,
+            self.target_img.rows,
+            detection_score)
+
+
+

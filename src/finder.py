@@ -1,41 +1,36 @@
-import cv2
-import numpy as np
-import base64
+from cv2img import Rect
+from pyramid_template_matcher import PyramidTemplateMatcher
 
 DEFAULT_PYRAMID_MIN_TARGET_DIMENSION = 12
 DEFAULT_FIND_ALL_MAX_RETURN = 100
 
-PYRAMID_MIN_TARGET_DIMENSION_ALL = 50
 CENTER_REMATCH_THRESHOLD = 0.99
 BORDER_MARGIN = 0.2
 
 class Finder:
-    def __init__(self):
-        self._source = None
-        self._roi = None
+    def __init__(self, source_img):
+        self._source_img = None
 
         self._matcher = None
         self._pyramid_min_target_dimension = DEFAULT_PYRAMID_MIN_TARGET_DIMENSION
 
-    def set_roi(self, x, y, w, h):
-        self.roi = Rect(x, y, w, h)
+        self._resize_ratio_list = [1, 0.75, 0.5, 0.25]
 
-    def _init_info(self):
-        rows, cols, _ = self._source.shape
-        self._roi = Rect(0, 0, rows, cols)
+    def find(self, target_img, min_similarity):
+        target_rows, target_cols = target_img.shape
+        matcher = None
 
-    def find(self, target, min_similarity):
-        target_rows, target_cols = target.shape
-        pass
+        if target_img > self._source_img:
+            return None
 
-if __name__ == "__main__":
-    finder = Finder()
-    #finder.load_file("./resources/screen.png")
+        ratio = min(target_img.rows / self._pyramid_min_target_dimension,
+                    target_img.cols / self._pyramid_min_target_dimension)
 
-    with open("./resources/base64-img", 'rb')  as img_stream:
-        binary = img_stream.read()
+        for resize_ratio in self._resize_ratio_list:
+            new_ratio = ratio * resize_ratio
 
-    finder.load_base64(binary)
-
-    print("test")
+            if new_ratio >= 1:
+                matcher = PyramidTemplateMatcher(self._source_img, target_img, 1, new_ratio)
+            else:
+                return None
 

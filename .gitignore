@@ -22,3 +22,4 @@ sikuli-script/src/main/java/com/sun/awt
 *.pyc
 *.so
 .idea
+.cache

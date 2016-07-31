@@ -9,12 +9,21 @@ class Rect:
         self.w = w
         self.h = h
 
+    def __str__(self):
+        return "x:{x}, y:{y}, w:{w}, h:{h}".format(
+            x=self.x,
+            y=self.y,
+            w=self.w,
+            h=self.h
+        )
+
 class CV2Img:
     def __init__(self, source=None):
         self._source = source
         self._roi = None
 
-        self._update_source_info()
+        if source is not None:
+            self._update_source_info()
 
     @property
     def source(self):
@@ -22,7 +31,7 @@ class CV2Img:
 
     @source.setter
     def source(self, value):
-        self.source = value
+        self._source = value
         self._update_source_info()
 
     @property
@@ -37,7 +46,13 @@ class CV2Img:
 
     def load_file(self, file_path):
         # The 1 means return 3-channel color image (without alpha channel)
-        self.source = cv2.imread(file_path, 1)
+        img = cv2.imread(file_path, 1)
+
+        if img is None:
+            raise Exception("Can't load image from {}".format(file_path))
+        else:
+            self.source = img
+
 
     def load_binary(self, binary):
         buf = np.fromstring(binary, dtype='uint8')
@@ -71,7 +86,7 @@ class CV2Img:
 
     def resize(self, factor):
         h, w, _ = self.source.shape
-        new_size = (h/factor, w/factor)
+        new_size = (int(w/factor), int(h/factor))
         new_img = CV2Img()
         new_img.source = cv2.resize(self.source, new_size, interpolation=cv2.INTER_NEAREST)
 
@@ -83,6 +98,11 @@ class CV2Img:
 
         return new_img
 
+    def show(self, title=None):
+        if not title:
+            title = "Show Image"
+        cv2.imshow(title, self.source)
+        cv2.waitKey(0)
     #############################################################################
     #
     # Operator
@@ -100,5 +120,7 @@ class CV2Img:
 
         return shape[0] > other_shape[0] or shape[1] > other_shape[1]
 
+    def __eq__(self, other):
+        return np.array_equal(self.source, other.source)
 
 
