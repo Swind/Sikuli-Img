@@ -25,9 +25,15 @@ env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.0
 ## 編譯 OpenCV3
 
 ```bash
+# OpenCV
 wget https://github.com/opencv/opencv/archive/3.1.0.tar.gz
 tar -zxvf 3.1.0.tar.gz
-cd 3.1.0
+rm 3.1.0.tar.gz
+
+# OpenCV contrib
+https://github.com/opencv/opencv_contrib/archive/3.1.0.tar.gz
+tar -zxvf 3.1.0.tar.gz
+cd opencv-3.1.0
 
 # 設定使用 python3 與 python packages
 pyenv local 3.5.0
@@ -36,11 +42,24 @@ pip install numpy
 # 使用 cmake 編譯
 mkdir build
 cd build
+
+PYVERSION_NUMBER=3.5.0
+PYVERSION_NAME=python3.5
+PYHOME=$HOME/.pyenv/versions/$PYVERSION_NUMBER
+
+echo $PYHOME
+
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
-        -D CMAKE_INSTALL_PREFIX=/usr/local \    -D INSTALL_PYTHON_EXAMPLES=ON \
-        -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
-        -D BUILD_EXAMPLES=ON .. \
-        -DPYTHON_INCLUDE_DIR=$HOME/.pyenv/versions/3.5.0/include/python3.5m -DPYTHON_LIBRARY=$HOME/.pyenv/versions/3.5.0/lib/libpython3.5m.so -DENABLE_PRECOMPILED_HEADERS=OFF
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      -D INSTALL_PYTHON_EXAMPLES=ON \
+      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-3.1.0/modules \
+      -D BUILD_EXAMPLES=ON .. \
+      -DPYTHON3_INCLUDE_DIRS=$PYHOME/include/python3.5m \
+      -DPYTHON3_LIBRARY=$PYHOME/lib/libpython3.5m.so \
+      -DPYTHON3_EXECUTABLE=$PYHOME/bin/python \
+      -DPYTHON3_PACKAGES_PATH=$PYHOME/lib/$PYVERSION_NAME/site-packages \
+      -DBUILD_opencv_python3=ON \
+      -DENABLE_PRECOMPILED_HEADERS=OFF
 
 make -j4
 sudo make install
