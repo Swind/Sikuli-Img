@@ -81,44 +81,47 @@ class PyramidTemplateMatcher:
 
         self.cache_result[y0:y1, x0:x1] = 0
 
-    def next(self, number=1):
+    def next(self):
 
+        if self.source_img < self.target_img:
+            return FindResult(0, 0, 0, 0, -1)
+
+        if self.lower_pyramid != None:
+            return self._next_from_lower_pyramid()
+
+        detection_score = -1
+        detection_loc = None
+
+        if self.cache_result is None:
+            detection_score, detection_loc = self.find_best()
+        else:
+            _, detection_score, _, detection_loc = cv2.minMaxLoc(self.cache_result)
+
+        x_margin = int(self.target_img.cols / 3)
+        y_margin = int(self.target_img.rows / 3)
+        detection_x, detection_y = detection_loc
+
+        self.erase_result(detection_x,
+                          detection_y,
+                          x_margin,
+                          y_margin)
+
+        result = FindResult(detection_x,
+                          detection_y,
+                          self.target_img.cols,
+                          self.target_img.rows,
+                          detection_score)
+
+        return result
+
+    def next_list(self, number=1):
         result_list = []
 
         for index in range(0, number):
-
-            if self.source_img < self.target_img:
-                return FindResult(0, 0, 0, 0, -1)
-
-            if self.lower_pyramid != None:
-                return self._next_from_lower_pyramid()
-
-            detection_score = -1
-            detection_loc = None
-
-            if self.cache_result is None:
-                detection_score, detection_loc = self.find_best()
-            else:
-                _, detection_score, _, detection_loc = cv2.minMaxLoc(self.cache_result)
-
-            x_margin = int(self.target_img.cols / 3)
-            y_margin = int(self.target_img.rows / 3)
-            detection_x, detection_y = detection_loc
-
-            self.erase_result(detection_x,
-                              detection_y,
-                              x_margin,
-                              y_margin)
-
-            result = FindResult(detection_x,
-                              detection_y,
-                              self.target_img.cols,
-                              self.target_img.rows,
-                              detection_score)
-
-            result_list.append(result)
+            result_list.append(self.next())
 
         return result_list
+
 
     def _next_from_lower_pyramid(self):
         match = self.lower_pyramid.next()
