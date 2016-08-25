@@ -9,8 +9,8 @@ BORDER_MARGIN = 0.2
 
 
 class Finder:
-    def __init__(self, source_img):
-        self._source_img = None
+    def __init__(self, source_img=None):
+        self._source_img = source_img
 
         self._matcher = None
         self._pyramid_min_target_dimension = DEFAULT_PYRAMID_MIN_TARGET_DIMENSION
@@ -28,7 +28,7 @@ class Finder:
         else:
             source_img = self._source_img
 
-        target_rows, target_cols = target_img.shape
+        target_rows, target_cols, _ = target_img.shape
         matcher = None
 
         if target_img > source_img:
@@ -42,10 +42,10 @@ class Finder:
         def save_results_and_check(_matcher):
             result_list.clear()
             result_list.extend(_matcher.next_list(5))
-            sorted(result_list, key=lambda item: item.score, reversed=True)
+            sorted(result_list, key=lambda item: item.score, reverse=True)
 
             # Good enough
-            if result_list[0] >= max(min_similarity, CENTER_REMATCH_THRESHOLD):
+            if result_list[0].score >= max(min_similarity, CENTER_REMATCH_THRESHOLD):
                 return True
 
             return False
