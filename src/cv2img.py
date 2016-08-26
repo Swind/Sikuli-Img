@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import base64
 
+
 class Rect:
     def __init__(self, x=0, y=0, w=0, h=0):
         self.x = x
@@ -16,6 +17,7 @@ class Rect:
             w=self.w,
             h=self.h
         )
+
 
 class CV2Img:
     def __init__(self, source=None):
@@ -53,7 +55,6 @@ class CV2Img:
         else:
             self.source = img
 
-
     def load_binary(self, binary):
         buf = np.fromstring(binary, dtype='uint8')
 
@@ -80,13 +81,13 @@ class CV2Img:
 
     def crop(self, roi):
         new_img = CV2Img()
-        new_img.source = self.source[roi.y:roi.y+roi.h, roi.x:roi.x+roi.w]
+        new_img.source = self.source[roi.y:roi.y + roi.h, roi.x:roi.x + roi.w]
 
         return new_img
 
     def resize(self, factor):
         h, w, _ = self.source.shape
-        new_size = (int(w/factor), int(h/factor))
+        new_size = (int(w / factor), int(h / factor))
         new_img = CV2Img()
         new_img.source = cv2.resize(self.source, new_size, interpolation=cv2.INTER_NEAREST)
 
@@ -103,6 +104,16 @@ class CV2Img:
             title = "Show Image"
         cv2.imshow(title, self.source)
         cv2.waitKey(0)
+
+    def canny(self, threshold1=50, threshold2=200):
+        return cv2.Canny(self.source, threshold1, threshold2)
+
+    def draw_result_range(self, find_result, color=(0, 0, 255)):
+        cv2.rectangle(self.source,
+                      (find_result.x, find_result.y),
+                      (find_result.x + find_result.w, find_result.y + find_result.h),
+                      color, 1)
+
     #############################################################################
     #
     # Operator
@@ -122,5 +133,3 @@ class CV2Img:
 
     def __eq__(self, other):
         return np.array_equal(self.source, other.source)
-
-
