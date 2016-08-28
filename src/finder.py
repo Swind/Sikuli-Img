@@ -39,6 +39,12 @@ class Finder:
 
         return ResultGenerator(source_img, target_img, self._roi, min_similarity, ratio, self._resize_ratio_list)
 
+    def find_by_pyramid_template(self):
+        pass
+
+    def find_by_multiscale_template(self):
+        pass
+
 class ResultGenerator:
     def __init__(self, source_img, target_img, roi, min_similarity, ratio, resize_ratio_list):
         self._source_img = source_img
