@@ -8,11 +8,13 @@ class MultiScaleTemplateMatcher:
         self.target_img = target_img.gray().canny(50, 200)
 
     def find_best(self):
+        found = None
+
         for scale in np.linspace(0.2, 1.0, 20)[::-1]:
             # resize the image according to the scale, and keep track
             # of the ratio of the resizing
             r = 1 / scale
-            resized_source = self.source_img.rezie(r)
+            resized_source = self.source_img.resize(scale)
 
             # if the resized image is smaller than the template, then break
             # from the loop
@@ -20,9 +22,9 @@ class MultiScaleTemplateMatcher:
                 break
 
             edged = resized_source.canny(50, 200)
-            result = cv2.matchTemplate(edged, self._target_img, cv2.TM_CCOEFF)
+            result = cv2.matchTemplate(edged.source, self.target_img.source, cv2.TM_CCOEFF_NORMED)
             _, maxVal, _, maxLoc = cv2.minMaxLoc(result)
-
+            print(maxVal)
             if found is None or maxVal > found[0]:
                 found = (maxVal, maxLoc, r)
 
@@ -33,4 +35,4 @@ class MultiScaleTemplateMatcher:
         y *= r
 
 
-        return FindResult(x, y, self.target_img.cols, self.target_img.rows, maxVal)
+        return FindResult(x, y, self.target_img.cols * r, self.target_img.rows * r, maxVal)

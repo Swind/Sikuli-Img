@@ -48,7 +48,7 @@ def test_cv2img_operations():
     assert (img < img2) == False
 
     # Resize
-    img3 = img.resize(2)
+    img3 = img.resize(0.5)
     assert img3.rows == 640
     assert img3.cols == 384
     assert img.rows == 1280

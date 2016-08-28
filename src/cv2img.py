@@ -41,7 +41,7 @@ class CV2Img:
         return self.source.shape
 
     def _update_source_info(self):
-        self.rows, self.cols, _ = self.source.shape
+        self.rows, self.cols = self.source.shape[:2]
         self._roi = Rect(0, 0, self.rows, self.cols)
 
         self.mean, self.stddev = cv2.meanStdDev(self.source)
@@ -86,8 +86,8 @@ class CV2Img:
         return new_img
 
     def resize(self, factor):
-        h, w, _ = self.source.shape
-        new_size = (int(w / factor), int(h / factor))
+        h, w = self.source.shape[:2]
+        new_size = (int(w * factor), int(h * factor))
         new_img = CV2Img()
         new_img.source = cv2.resize(self.source, new_size, interpolation=cv2.INTER_NEAREST)
 
@@ -106,7 +106,8 @@ class CV2Img:
         cv2.waitKey(0)
 
     def canny(self, threshold1=50, threshold2=200):
-        return cv2.Canny(self.source, threshold1, threshold2)
+        return CV2Img(cv2.Canny(self.source, threshold1, threshold2))
+
 
     def draw_result_range(self, find_result, color=(0, 0, 255)):
         cv2.rectangle(self.source,

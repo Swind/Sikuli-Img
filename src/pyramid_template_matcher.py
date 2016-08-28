@@ -5,10 +5,10 @@ from cv2img import Rect
 
 class FindResult:
     def __init__(self, x=0, y=0, w=0, h=0, score=-1):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
+        self.x = int(x)
+        self.y = int(y)
+        self.w = int(w)
+        self.h = int(h)
         self.score = score
 
     def __str__(self):
@@ -38,8 +38,8 @@ class PyramidTemplateMatcher:
 
     def _create_small_matcher(self):
         return PyramidTemplateMatcher(
-            self.source_img.resize(self.factor),
-            self.target_img.resize(self.factor),
+            self.source_img.resize(1/self.factor),
+            self.target_img.resize(1/self.factor),
             self.level - 1,
             self.factor
         )
