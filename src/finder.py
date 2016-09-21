@@ -96,6 +96,9 @@ class ResultGenerator:
 
         return None, []
 
+    def next(self):
+        return self.__next__()
+
     def __iter__(self):
         return self
 

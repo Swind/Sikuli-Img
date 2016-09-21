@@ -24,7 +24,6 @@ class MultiScaleTemplateMatcher:
             edged = resized_source.canny(50, 200)
             result = cv2.matchTemplate(edged.source, self.target_img.source, cv2.TM_CCOEFF_NORMED)
             _, maxVal, _, maxLoc = cv2.minMaxLoc(result)
-            print(maxVal)
             if found is None or maxVal > found[0]:
                 found = (maxVal, maxLoc, r)
 
