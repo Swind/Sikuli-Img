@@ -1,13 +1,4 @@
-#!/usr/bin/env python
-
-'''
-Uses SURF to match two images.
-Based on the sample code from opencv:
-  samples/python2/find_obj.py
-USAGE
-  find_obj.py <image1> <image2>
-'''
-
+from cv2img import CV2Img
 import numpy
 import cv2
 
@@ -21,11 +12,12 @@ import sys
 def match_images(img1, img2):
     """Given two images, returns the matches"""
     detector = cv2.xfeatures2d.SURF_create(400, 5, 5)
+    #detector = cv2.AKAZE_create()
     matcher = cv2.BFMatcher(cv2.NORM_L2)
 
     kp1, desc1 = detector.detectAndCompute(img1, None)
     kp2, desc2 = detector.detectAndCompute(img2, None)
-    # print 'img1 - %d features, img2 - %d features' % (len(kp1), len(kp2))
+    print('img1 - %d features, img2 - %d features' % (len(kp1), len(kp2)))
 
     raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2)  # 2
     kp_pairs = filter_matches(kp1, kp2, raw_matches)
@@ -58,8 +50,7 @@ def explore_match(win, img1, img2, kp_pairs, status=None, H=None):
     if H is not None:
         corners = numpy.float32([[0, 0], [w1, 0], [w1, h1], [0, h1]])
         corners = numpy.int32(cv2.perspectiveTransform(corners.reshape(1, -1, 2), H).reshape(-1, 2) + (w1, 0))
-        print(corners)
-        cv2.polylines(vis, [corners], True, (255, 255, 255))
+        cv2.polylines(vis, [corners], True, (0, 0, 255))
 
     if status is None:
         status = numpy.ones(len(kp_pairs), numpy.bool_)
@@ -100,10 +91,10 @@ def draw_matches(window_name, kp_pairs, img1, img2):
 
     if len(kp_pairs) >= 4:
         H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
-        # print '%d / %d  inliers/matched' % (numpy.sum(status), len(status))
+        print('%d / %d  inliers/matched' % (numpy.sum(status), len(status)))
     else:
         H, status = None, None
-        # print '%d matches found, not enough for homography estimation' % len(p1)
+        print('%d matches found, not enough for homography estimation' % len(p1))
 
     if len(p1):
         explore_match(window_name, img1, img2, kp_pairs, status, H)
@@ -117,10 +108,11 @@ if __name__ == '__main__':
     """Test code: Uses the two specified"""
 
     fn1 = "./resources/facebook_screen.png"
-    fn2 = "./resources/facebook_account.png"
+    fn2 = "./resources/facebook_new_account.png"
 
-    img1 = cv2.imread(fn1, 0)
-    img2 = cv2.imread(fn2, 0)
+    img2 = cv2.imread(fn1, 0)
+    img1 = cv2.imread(fn2, 0)
+
 
     kp_pairs = match_images(img1, img2)
 
