@@ -4,7 +4,36 @@
 
 參考 [Install OpenCV 3 with Python 3 on Windows](https://solarianprogrammer.com/2016/09/17/install-opencv-3-with-python-3-on-windows/)
 
-P.S 未驗證，但是看起來可行
+1. 決定好要使用 x86 會 x64 的版本下載相對應的 Python 3.5.2 [x86](https://www.python.org/ftp/python/3.5.2/python-3.5.2.exe)/[x64](https://www.python.org/ftp/python/3.5.2/python-3.5.2-amd64.exe)
+
+2. 下載 [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/zh-TW/download/details.aspx?id=48145)。也可以直接安裝 [Visual Studio 2015 Community](https://www.visualstudio.com/zh-hans/downloads/)
+
+3. 依照 Python 版本與 x86/x64 下載已經預先編譯好的 [numpy](http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy) 與 [opencv3.1](http://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv)
+
+Python 3.5.2 (x86) 的環境下
+
+numpy-1.11.2rc1+mkl-cp35-cp35m-win32.whl
+opencv_python-3.1.0-cp35-cp35m-win32.whl
+
+4. 開啟 cmd 使用 pip 安裝剛剛下載的檔案
+
+```bash
+pip install "numpy-1.11.2rc1+mkl-cp35-cp35m-win32.whl"
+pip install "opencv_python-3.1.0-cp35-cp35m-win32.whl"
+```
+
+5. 測試
+
+開啟 cmd 執行 pytho
+
+```bash
+Python 3.5.2 (v3.5.2:4def2a2901a5, Jun 25 2016, 22:01:18) [MSC v.1900 32 bit (Intel)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import cv2
+>>> print(cv2.__version__)
+3.1.0
+>>> exit()
+```
 
 # 設定開發環境 (Linux 跟 OSX）
 
