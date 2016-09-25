@@ -1,19 +1,15 @@
 from cv2img import Rect
-from pyramid_template_matcher import PyramidTemplateMatcher
+from finder.template_matcher import TemplateMatcher
+from finder import Finder
 
-DEFAULT_PYRAMID_MIN_TARGET_DIMENSION = 12
-DEFAULT_FIND_ALL_MAX_RETURN = 100
+class TemplateFinder(Finder):
+    DEFAULT_PYRAMID_MIN_TARGET_DIMENSION = 12
+    CENTER_REMATCH_THRESHOLD = 0.99
 
-CENTER_REMATCH_THRESHOLD = 0.99
-BORDER_MARGIN = 0.2
-
-
-class Finder:
     def __init__(self, source_img=None):
         self._source_img = source_img
 
         self._matcher = None
-        self._pyramid_min_target_dimension = DEFAULT_PYRAMID_MIN_TARGET_DIMENSION
 
         self._resize_ratio_list = [1, 0.75, 0.5, 0.25]
         self._roi = None
@@ -34,16 +30,11 @@ class Finder:
         if target_img > source_img:
             return None
 
-        ratio = min(target_img.rows / self._pyramid_min_target_dimension,
-                    target_img.cols / self._pyramid_min_target_dimension)
+        ratio = min(target_img.rows / self.DEFAULT_PYRAMID_MIN_TARGET_DIMENSION,
+                    target_img.cols / self.DEFAULT_PYRAMID_MIN_TARGET_DIMENSION)
 
         return ResultGenerator(source_img, target_img, self._roi, min_similarity, ratio, self._resize_ratio_list)
 
-    def find_by_pyramid_template(self):
-        pass
-
-    def find_by_multiscale_template(self):
-        pass
 
 class ResultGenerator:
     def __init__(self, source_img, target_img, roi, min_similarity, ratio, resize_ratio_list):
@@ -74,7 +65,7 @@ class ResultGenerator:
             new_ratio = self._ratio * resize_ratio
 
             if new_ratio >= 1:
-                matcher = PyramidTemplateMatcher(self._source_img, self._target_img, 1, new_ratio)
+                matcher = TemplateMatcher(self._source_img, self._target_img, 1, new_ratio)
 
                 # Good enough
                 result_list = self._check_result_is_good_enough(matcher)
@@ -87,7 +78,7 @@ class ResultGenerator:
             source_img = self._source_img.gray()
             target_img = self._target_img.gray()
 
-            matcher = PyramidTemplateMatcher(source_img, target_img, 0, 1)
+            matcher = TemplateMatcher(source_img, target_img, 0, 1)
 
             # Good enough
             result_list = self._check_result_is_good_enough(matcher)

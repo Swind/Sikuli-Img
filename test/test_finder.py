@@ -1,8 +1,7 @@
-from finder import Finder
-from cv2img import CV2Img
 from config import IMG_PATH
+from cv2img import CV2Img
+from finder.template_finder import Finder
 
-import pytest
 
 def test_pyramid_template_matcher():
     source = CV2Img()
