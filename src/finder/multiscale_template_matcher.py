@@ -1,6 +1,8 @@
-import numpy as np
 import cv2
-from pyramid_template_matcher import FindResult
+import numpy as np
+
+from finder.template_matcher import FindResult
+
 
 class MultiScaleTemplateMatcher:
     def __init__(self, source_img, target_img):

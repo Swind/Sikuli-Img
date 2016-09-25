@@ -1,10 +1,10 @@
-from multiscale_template_matching import MultiScaleTemplateMatcher
-from finder import Finder
-from cv2img import CV2Img
-from config import IMG_PATH
-
-import pytest
 import numpy as np
+import pytest
+
+from config import IMG_PATH
+from cv2img import CV2Img
+from finder.multiscale_template_matcher import MultiScaleTemplateMatcher
+from finder.template_finder import Finder
 
 size_list = np.arange(0.2, 1.0, 0.01)
 error = 10 #px

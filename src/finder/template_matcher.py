@@ -2,26 +2,10 @@ import cv2
 import numpy as np
 
 from cv2img import Rect
-
-class FindResult:
-    def __init__(self, x=0, y=0, w=0, h=0, score=-1):
-        self.x = int(x)
-        self.y = int(y)
-        self.w = int(w)
-        self.h = int(h)
-        self.score = score
-
-    def __str__(self):
-        return "x:{x}, y:{y}, w:{w}, h:{h}, score:{score}".format(
-            x=self.x,
-            y=self.y,
-            w=self.w,
-            h=self.h,
-            score=self.score
-        )
+from utils import FindResult
 
 
-class PyramidTemplateMatcher:
+class TemplateMatcher:
     def __init__(self, source_img, target_img, level, factor):
         self.source_img = source_img
         self.target_img = target_img
@@ -37,14 +21,44 @@ class PyramidTemplateMatcher:
             self.lower_pyramid = self._create_small_matcher()
 
     def _create_small_matcher(self):
-        return PyramidTemplateMatcher(
-            self.source_img.resize(1/self.factor),
-            self.target_img.resize(1/self.factor),
+        return TemplateMatcher(
+            self.source_img.resize(1 / self.factor),
+            self.target_img.resize(1 / self.factor),
             self.level - 1,
             self.factor
         )
 
-    def find_best(self, roi=None):
+    def next(self):
+
+        if self.source_img < self.target_img:
+            return FindResult(0, 0, 0, 0, -1)
+
+        if self.lower_pyramid != None:
+            return self._next_from_lower_pyramid()
+
+        if self.cache_result is None:
+            detection_score, detection_loc = self._find_best()
+        else:
+            _, detection_score, _, detection_loc = cv2.minMaxLoc(self.cache_result)
+
+        x_margin = int(self.target_img.cols / 3)
+        y_margin = int(self.target_img.rows / 3)
+        detection_x, detection_y = detection_loc
+
+        self._erase_result(detection_x,
+                           detection_y,
+                           x_margin,
+                           y_margin)
+
+        result = FindResult(detection_x,
+                            detection_y,
+                            self.target_img.cols,
+                            self.target_img.rows,
+                            detection_score)
+
+        return result
+
+    def _find_best(self, roi=None):
         source_img = self.source_img
         target_img = self.target_img
 
@@ -71,7 +85,7 @@ class PyramidTemplateMatcher:
 
         return maxVal, maxLoc
 
-    def erase_result(self, x, y, x_margin, y_margin):
+    def _erase_result(self, x, y, x_margin, y_margin):
         x0 = max(x - x_margin, 0)
         y0 = max(y - y_margin, 0)
 
@@ -80,48 +94,6 @@ class PyramidTemplateMatcher:
         y1 = min(y + y_margin, rows)
 
         self.cache_result[y0:y1, x0:x1] = 0
-
-    def next(self):
-
-        if self.source_img < self.target_img:
-            return FindResult(0, 0, 0, 0, -1)
-
-        if self.lower_pyramid != None:
-            return self._next_from_lower_pyramid()
-
-        detection_score = -1
-        detection_loc = None
-
-        if self.cache_result is None:
-            detection_score, detection_loc = self.find_best()
-        else:
-            _, detection_score, _, detection_loc = cv2.minMaxLoc(self.cache_result)
-
-        x_margin = int(self.target_img.cols / 3)
-        y_margin = int(self.target_img.rows / 3)
-        detection_x, detection_y = detection_loc
-
-        self.erase_result(detection_x,
-                          detection_y,
-                          x_margin,
-                          y_margin)
-
-        result = FindResult(detection_x,
-                          detection_y,
-                          self.target_img.cols,
-                          self.target_img.rows,
-                          detection_score)
-
-        return result
-
-    def next_list(self, number=1):
-        result_list = []
-
-        for index in range(0, number):
-            result_list.append(self.next())
-
-        return result_list
-
 
     def _next_from_lower_pyramid(self):
         match = self.lower_pyramid.next()
@@ -139,9 +111,9 @@ class PyramidTemplateMatcher:
         x1 = min(x + self.target_img.cols + factor, self.source_img.cols)
         y1 = min(y + self.target_img.rows + factor, self.source_img.rows)
 
-        roi = Rect(x0, y0, x1-x0, y1-y0)
+        roi = Rect(x0, y0, x1 - x0, y1 - y0)
 
-        detection_score, detection_loc = self.find_best(roi)
+        detection_score, detection_loc = self._find_best(roi)
 
         detection_x, detection_y = detection_loc
         detection_x += roi.x
@@ -153,6 +125,3 @@ class PyramidTemplateMatcher:
             self.target_img.cols,
             self.target_img.rows,
             detection_score)
-
-
-

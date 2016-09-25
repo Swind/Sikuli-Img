@@ -1,8 +1,7 @@
-from pyramid_template_matcher import PyramidTemplateMatcher
-from cv2img import CV2Img
 from config import IMG_PATH
+from cv2img import CV2Img
+from finder.template_matcher import PyramidTemplateMatcher
 
-import pytest
 
 def test_pyramid_template_matcher():
     source = CV2Img()

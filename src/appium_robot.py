@@ -1,7 +1,6 @@
-from interface.robot import Robot
-from keycode import ANDROID_KEYCODE
 from cv2img import CV2Img
-from appium.webdriver.common.touch_action import TouchAction
+from keycode import ANDROID_KEYCODE
+from robot import Robot
 
 KEYCODE = ANDROID_KEYCODE
 
