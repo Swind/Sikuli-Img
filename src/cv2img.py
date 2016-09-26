@@ -1,23 +1,7 @@
 import cv2
 import numpy as np
 import base64
-
-
-class Rect:
-    def __init__(self, x=0, y=0, w=0, h=0):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-
-    def __str__(self):
-        return "x:{x}, y:{y}, w:{w}, h:{h}".format(
-            x=self.x,
-            y=self.y,
-            w=self.w,
-            h=self.h
-        )
-
+from rectangle import Rectangle
 
 class CV2Img:
     def __init__(self, source=None):
@@ -42,7 +26,7 @@ class CV2Img:
 
     def _update_source_info(self):
         self.rows, self.cols = self.source.shape[:2]
-        self._roi = Rect(0, 0, self.rows, self.cols)
+        self._roi = Rectangle(0, 0, self.rows, self.cols)
 
         self.mean, self.stddev = cv2.meanStdDev(self.source)
 

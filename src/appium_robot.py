@@ -27,3 +27,7 @@ class AppiumRobot(Robot):
 
     def tap(self, x, y, duration):
         self._driver.tap([(x, y)], duration)
+
+    @property
+    def windows_size(self):
+        return self._driver.get_windows_size()

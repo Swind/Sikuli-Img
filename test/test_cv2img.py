@@ -1,5 +1,5 @@
 from cv2img import CV2Img
-from cv2img import Rect
+from cv2img import Region
 
 from config import IMG_PATH
 import pytest
@@ -61,7 +61,7 @@ def test_cv2img_operations():
     assert img4.cols == img.cols
 
     # Crop
-    roi = Rect(0, 0, 640, 384)
+    roi = Region(0, 0, 640, 384)
     img5 = img.crop(roi)
     assert img5.rows == 384
     assert img5.cols == 640
