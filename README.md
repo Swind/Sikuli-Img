@@ -64,7 +64,27 @@ pyenv 會下載 Python 原始碼來編譯，所以要設定參數讓他在編譯
 env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.2
 ```
 
+編譯完畢之後下
+
+```bash
+ls $HOME/.pyenv/versions/3.5.2/lib
+```
+
+應該會看到以下的檔案被編譯出來
+
+```bash
+libpython3.5m.so  libpython3.5m.so.1.0  libpython3.so  pkgconfig  python3.5
+```
+
 ## 編譯 OpenCV3
+
+安裝編譯所需要的 packages
+
+```bash
+# Ubuntu
+sudo apt-get install build-essential
+sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+```
 
 ```bash
 
@@ -101,18 +121,21 @@ cd build
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
       -D CMAKE_INSTALL_PREFIX=/usr/local \
       -D INSTALL_PYTHON_EXAMPLES=ON \
-      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
-      -D BUILD_EXAMPLES=ON .. \
-      -DPYTHON_INCLUDE_DIR=$HOME/.pyenv/versions/3.5.2/include/python3.5m \
-      -DPYTHON_LIBRARY=$HOME/.pyenv/versions/3.5.2/lib/libpython3.5m.so \
-      -DENABLE_PRECOMPILED_HEADERS=OFF
+      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-3.1.0/modules \
+      -D BUILD_EXAMPLES=OFF \
+      -D INSTALL_C_EXAMPLES=OFF \
+      -D PYTHON3_EXECUTABLE=$HOME/.pyenv/shims/python \
+      -D PYTHON_INCLUDE_DIR=$HOME/.pyenv/versions/3.5.2/include/python3.5m \
+      -D PYTHON_LIBRARY=$HOME/.pyenv/versions/3.5.2/lib/libpython3.5m.so \
+      -D ENABLE_PRECOMPILED_HEADERS=OFF \
+      ..
 ```
 
 cmake 產生的訊息中，注意 Python3 這邊是否有正確的找到 Python shared library 的路徑
 
 ```
 --   Python 3:
---     Interpreter:                 /home/swind/.pyenv/shims/python3 (ver 3.5.2)
+--     Interpreter:                 /home/tester/.pyenv/shims/python3 (ver 3.5.2)
 --     Libraries:                   /home/swind/.pyenv/versions/3.5.2/lib/libpython3.5m.so (ver 3.5.2)
 --     numpy:                       /home/swind/.pyenv/versions/3.5.2/lib/python3.5/site-packages/numpy/core/include (ver 1.11.1)
 --     packages path:               lib/python3.5/site-packages
@@ -121,9 +144,20 @@ cmake 產生的訊息中，注意 Python3 這邊是否有正確的找到 Python 
 ## 編譯 OpenCV
 
 ```bash
-cd build
 make -j4
 make install
+```
+
+# 複製 library
+
+在 opencv3.1.0 中的 `build/lib` 資料夾中應該會有 `cv2.cpython-35m-x86_64-linux-gnu.so`
+
+將此檔案複製到 `$HOME/.pyenv/versions/3.5.2/lib/python3.5/cv2.so`
+
+這樣 pyenv 中的 Python 3.5.2 就能找到 cv2 這個 package
+
+```bash
+cp lib/python3/cv2.cpython-35m-x86_64-linux-gnu.so /home/tester/.pyenv/versions/3.5.2/lib/python3.5/cv2.so
 ```
 
 # 測試
