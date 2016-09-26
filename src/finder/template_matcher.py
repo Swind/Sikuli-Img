@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-from cv2img import Rect
 from utils import FindResult
+from rectangle import Rectangle
 
 
 class TemplateMatcher:
@@ -111,7 +111,7 @@ class TemplateMatcher:
         x1 = min(x + self.target_img.cols + factor, self.source_img.cols)
         y1 = min(y + self.target_img.rows + factor, self.source_img.rows)
 
-        roi = Rect(x0, y0, x1 - x0, y1 - y0)
+        roi = Rectangle(x0, y0, x1 - x0, y1 - y0)
 
         detection_score, detection_loc = self._find_best(roi)
 

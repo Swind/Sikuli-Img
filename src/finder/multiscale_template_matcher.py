@@ -1,18 +1,19 @@
 import cv2
 import numpy as np
 
-from finder.template_matcher import FindResult
-
+from utils import FindResult
 
 class MultiScaleTemplateMatcher:
     def __init__(self, source_img, target_img):
         self.source_img = source_img.gray()
         self.target_img = target_img.gray().canny(50, 200)
 
-    def find_best(self):
+    def find(self, min_scale=0.8, max_scale=1.2, interval=0.01):
         found = None
 
-        for scale in np.linspace(0.2, 1.0, 20)[::-1]:
+        sample_num = (max_scale - min_scale) / interval
+
+        for scale in np.linspace(min_scale, max_scale, sample_num)[::-1]:
             # resize the image according to the scale, and keep track
             # of the ratio of the resizing
             r = 1 / scale

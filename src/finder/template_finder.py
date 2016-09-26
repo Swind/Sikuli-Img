@@ -1,30 +1,32 @@
-from cv2img import Rect
 from finder.template_matcher import TemplateMatcher
-from finder import Finder
+from finder import  ResultGenerator, Finder
 
 class TemplateFinder(Finder):
     DEFAULT_PYRAMID_MIN_TARGET_DIMENSION = 12
     CENTER_REMATCH_THRESHOLD = 0.99
 
     def __init__(self, source_img=None):
-        self._source_img = source_img
+        """
+        :param source_img: The Source CV2Img
+        """
 
+        self._source_img = source_img
         self._matcher = None
 
         self._resize_ratio_list = [1, 0.75, 0.5, 0.25]
         self._roi = None
 
-    def set_roi(self, x, y, w, h):
-        self._roi = Rect(x, y, w, h)
+    def set_roi(self, rectangle):
+        self._roi = rectangle
 
-    def find(self, target_img, min_similarity):
+    def find(self, target_img, min_similarity=0.9):
 
         if self._roi:
             source_img = self._source_img.crop(self._roi)
         else:
             source_img = self._source_img
 
-        target_rows, target_cols, _ = target_img.shape
+        target_rows, target_cols = target_img.shape[:2]
         matcher = None
 
         if target_img > source_img:
@@ -33,10 +35,10 @@ class TemplateFinder(Finder):
         ratio = min(target_img.rows / self.DEFAULT_PYRAMID_MIN_TARGET_DIMENSION,
                     target_img.cols / self.DEFAULT_PYRAMID_MIN_TARGET_DIMENSION)
 
-        return ResultGenerator(source_img, target_img, self._roi, min_similarity, ratio, self._resize_ratio_list)
+        return TemplateFinderResultGenerator(source_img, target_img, self._roi, min_similarity, ratio, self._resize_ratio_list)
 
+class TemplateFinderResultGenerator(ResultGenerator):
 
-class ResultGenerator:
     def __init__(self, source_img, target_img, roi, min_similarity, ratio, resize_ratio_list):
         self._source_img = source_img
         self._target_img = target_img
@@ -48,13 +50,26 @@ class ResultGenerator:
         self._matcher = None
         self._result_list = None
 
+    def _next_list(self, matcher, size):
+        result = []
+
+        for index in range(0, size):
+            item = matcher.next()
+
+            if item is None:
+                break
+            else:
+                result.append(item)
+
+        return result
+
     def _check_result_is_good_enough(self, matcher):
         result_list = []
-        result_list.extend(matcher.next_list(5))
-        sorted(result_list, key=lambda item: item.score, reverse=True)
+        result_list.extend(self._next_list(matcher, 5))
+        result_list.sort(key=lambda item: item.score, reverse=True)
 
         # Good enough
-        if result_list[0].score >= max(self._min_similarity, CENTER_REMATCH_THRESHOLD):
+        if result_list[0].score >= max(self._min_similarity, TemplateFinder.CENTER_REMATCH_THRESHOLD):
             return result_list
 
         return None
@@ -72,33 +87,14 @@ class ResultGenerator:
                 if result_list:
                     return matcher, result_list
 
-        # Step 2: If the min_similarity is smaller than 0.99 and can't get good result in step 1
-        # Use the gray image to search
-        if self._min_similarity < 0.99:
-            source_img = self._source_img.gray()
-            target_img = self._target_img.gray()
-
-            matcher = TemplateMatcher(source_img, target_img, 0, 1)
-
-            # Good enough
-            result_list = self._check_result_is_good_enough(matcher)
-            if result_list:
-                return matcher, result_list
-
         return None, []
 
     def next(self):
-        return self.__next__()
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
         if self._result_list is None:
             self._matcher, self._result_list = self._create_matcher()
 
         if len(self._result_list) == 0:
-            raise StopIteration
+            return None
 
         elif self._result_list[0].score >= self._min_similarity - 0.0000001:
             result = self._result_list.pop(0)
@@ -108,8 +104,6 @@ class ResultGenerator:
                 result.y += self._roi.y
 
             self._result_list.append(self._matcher.next())
-            sorted(self._result_list, key=lambda item: item.score, reverse=True)
+            self._result_list.sort(key=lambda item: item.score, reverse=True)
 
             return result
-
-        raise StopIteration

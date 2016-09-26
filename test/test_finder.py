@@ -1,23 +1,28 @@
 from config import IMG_PATH
 from cv2img import CV2Img
-from finder.template_finder import Finder
+from finder.template_finder import TemplateFinder
 
+import pytest
 
-def test_pyramid_template_matcher():
+def _test_template_finder(source_path, target_path, result_len):
     source = CV2Img()
-    source.load_file(IMG_PATH("screen.png"))
+    source.load_file(IMG_PATH(source_path))
 
     target = CV2Img()
-    target.load_file(IMG_PATH("gmail.png"))
+    target.load_file(IMG_PATH(target_path))
 
-    finder = Finder(source)
-    result_generator = finder.find(target, 0.9)
+    finder = TemplateFinder(source)
+    results = finder.find_all(target, 0.9)
 
-    results = list(result_generator)
-    assert len(results) == 1
-    print(results[0])
+    assert len(results) == result_len
 
-    result = source.crop(results[0])
-    assert result == target
+    for item in results:
+        result = source.crop(item)
+        assert result == target
 
 
+def test_template_finder_find_gmail():
+    _test_template_finder(IMG_PATH("screen.png"), IMG_PATH("gmail.png"), 1)
+
+def test_template_finder_find_checkbox():
+    _test_template_finder(IMG_PATH("puffin_settings.png"), IMG_PATH("puffin_settings_check.png"), 2)
