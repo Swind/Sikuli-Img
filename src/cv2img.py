@@ -39,14 +39,20 @@ class CV2Img:
         else:
             self.source = img
 
+        return self
+
     def load_binary(self, binary):
         buf = np.fromstring(binary, dtype='uint8')
 
         # The 1 means return 3-channel color image (without alpha channel)
         self.source = cv2.imdecode(buf, cv2.IMREAD_UNCHANGED)
 
+        return self
+
     def load_base64(self, encoded_string):
         self.load_binary(base64.b64decode(encoded_string))
+
+        return self
 
     def is_same_color(self):
         return np.sum(self.stddev[0:4]) <= 1e-5

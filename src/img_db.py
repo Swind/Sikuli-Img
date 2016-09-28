@@ -19,7 +19,7 @@ class ImgFile:
 
     def load(self):
         img = CV2Img()
-        img.load_file(self.file_path)
+        img.load_file(self._path)
 
         if self._roi:
             img = img.crop(self._roi)
@@ -27,17 +27,19 @@ class ImgFile:
         return img
 
     def __getattr__(self, item):
-        if self._map is None:
+        if self._map is None and "_subimages" not in self._map:
             return None
 
-        map_item = map[item]
+        subimage = self._map["_subimages"].get(item, None)
+        if subimage is None:
+            return None
 
-        if "_roi" in map_item:
-            roi = Rectangle(**map_item["_roi"])
+        if "_roi" in subimage:
+            roi = Rectangle(**subimage["_roi"])
         else:
-            roi = self._roi
+            roi = None
 
-        return ImgFile(self.file_path, roi)
+        return ImgFile(self._path, roi)
 
 
 class ImgDB:
@@ -45,10 +47,15 @@ class ImgDB:
         self._root = root_dir
 
     def __getattr__(self, item):
+        # Folder
         path = os.path.join(self._root, item)
 
         if os.path.exists(path):
             if os.path.isdir(path):
                 return ImgDB(path)
-            elif os.path.isfile(path):
+
+        # Picture
+        path = os.path.join(self._root, item + ".png")
+        if os.path.exists(path):
+            if os.path.isfile(path):
                 return ImgFile(path)
