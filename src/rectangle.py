@@ -19,4 +19,4 @@ class Rectangle:
 
     @property
     def center(self):
-        return (int((self.x+self.w)/2), int((self.y+self.h)/2))
+        return (int(self.x+self.w/2), int(self.y+self.h/2))
