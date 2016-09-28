@@ -32,7 +32,7 @@ class CV2Img:
 
     def load_file(self, file_path):
         # The 1 means return 3-channel color image (without alpha channel)
-        img = cv2.imread(file_path, 1)
+        img = cv2.imread(file_path, -1)
 
         if img is None:
             raise Exception("Can't load image from {}".format(file_path))
