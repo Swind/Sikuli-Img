@@ -1,6 +1,7 @@
 from config import IMG_PATH
-from cv2img import CV2Img
-from finder.template_matcher import PyramidTemplateMatcher
+
+from pysikuli.cv2img import CV2Img
+from pysikuli.template_matcher import TemplateMatcher
 
 
 def test_pyramid_template_matcher():
@@ -12,7 +13,7 @@ def test_pyramid_template_matcher():
 
     ratio = min(target.rows / 12, target.cols / 12)
 
-    matcher = PyramidTemplateMatcher(source, target, 1, ratio)
+    matcher = TemplateMatcher(source, target, 1, ratio)
     result = matcher.next()
     assert result.score == 1.0
 

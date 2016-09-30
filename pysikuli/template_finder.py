@@ -1,5 +1,6 @@
-from finder.template_matcher import TemplateMatcher
-from finder import  ResultGenerator, Finder
+from pysikuli import  ResultGenerator, Finder
+from .template_matcher import TemplateMatcher
+
 
 class TemplateFinder(Finder):
     DEFAULT_PYRAMID_MIN_TARGET_DIMENSION = 12

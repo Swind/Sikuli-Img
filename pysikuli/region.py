@@ -1,5 +1,6 @@
-from cv2img import Rectangle
-from finder.template_finder import TemplateFinder
+from pysikuli.template_finder import TemplateFinder
+from .cv2img import Rectangle
+
 
 class Region(Rectangle):
     """

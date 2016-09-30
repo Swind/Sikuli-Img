@@ -1,5 +1,5 @@
-from adb_roboot import ADBRobot
-from keycode import ANDROID_KEYCODE as KEYCODE
+from pysikuli.adb_roboot import ADBRobot
+from pysikuli.keycode import ANDROID_KEYCODE as KEYCODE
 
 import time
 

@@ -1,7 +1,7 @@
-from cv2img import CV2Img
-from cv2img import Region
+from pysikuli.cv2img import CV2Img
+from pysikuli.cv2img import Region
 
-from config import IMG_PATH
+from .config import IMG_PATH
 import pytest
 
 def test_cv2img_load_image_from_file():

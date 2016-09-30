@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-from utils import FindResult
-from rectangle import Rectangle
+from .utils import FindResult
+from .rectangle import Rectangle
 
 
 class TemplateMatcher:

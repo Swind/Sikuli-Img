@@ -1,6 +1,6 @@
-from cv2img import CV2Img
-from keycode import ANDROID_KEYCODE
-from robot import Robot
+from .cv2img import CV2Img
+from .keycode import ANDROID_KEYCODE
+from .robot import Robot
 
 KEYCODE = ANDROID_KEYCODE
 
@@ -30,4 +30,4 @@ class AppiumRobot(Robot):
 
     @property
     def windows_size(self):
-        return self._driver.get_windows_size()
+        return self._driver.get_window_size()

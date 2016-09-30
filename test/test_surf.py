@@ -1,4 +1,4 @@
-from cv2img import CV2Img
+from pysikuli.cv2img import CV2Img
 import numpy
 import cv2
 

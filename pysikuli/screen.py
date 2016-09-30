@@ -1,7 +1,8 @@
-from cv2img import CV2Img
-from region import Region
+from .region import Region
 
-from keycode import ANDROID_KEYCODE as KEYCODE
+from .keycode import ANDROID_KEYCODE as KEYCODE
+
+import time
 
 class Screen:
     def __init__(self, robot):
@@ -28,3 +29,12 @@ class Screen:
 
     def find(self, target_img):
         return self.capture().find(target_img)
+
+    def wait(self, target_img, timeout=10):
+        for count in range(0, timeout):
+            if self.capture().find(target_img):
+                return True
+
+            time.sleep(1)
+
+        return False

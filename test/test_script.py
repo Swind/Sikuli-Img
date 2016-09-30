@@ -1,8 +1,8 @@
 import time
 
-from adb_roboot import ADBRobot
-from screen import Screen
-from img_db import ImgDB
+from pysikuli.adb_roboot import ADBRobot
+from pysikuli.screen import Screen
+from pysikuli.img_db import ImgDB
 
 
 def test_script():

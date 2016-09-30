@@ -1,8 +1,7 @@
-from config import IMG_PATH
-from cv2img import CV2Img
-from finder.template_finder import TemplateFinder
+from pysikuli.cv2img import CV2Img
+from pysikuli.template_finder import TemplateFinder
+from .config import IMG_PATH
 
-import pytest
 
 def _test_template_finder(source_path, target_path, result_len):
     source = CV2Img()

@@ -1,7 +1,7 @@
 import os
 import json
-from cv2img import CV2Img
-from rectangle import Rectangle
+from .cv2img import CV2Img
+from .rectangle import Rectangle
 
 class ImgFile:
     def __init__(self, file_path, roi=None):

@@ -2,9 +2,9 @@ import re
 
 from sh import adb, sed, grep
 
-from cv2img import CV2Img
-from keycode import ANDROID_KEYCODE
-from robot import Robot
+from .cv2img import CV2Img
+from .keycode import ANDROID_KEYCODE
+from .robot import Robot
 
 KEYCODE = ANDROID_KEYCODE
 

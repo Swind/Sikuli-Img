@@ -1,6 +1,6 @@
-from img_db import ImgDB
-from cv2img import CV2Img
-from rectangle import Rectangle
+from pysikuli.img_db import ImgDB
+from pysikuli.cv2img import CV2Img
+from pysikuli.rectangle import Rectangle
 import pytest
 
 

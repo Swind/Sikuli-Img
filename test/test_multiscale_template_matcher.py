@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-from config import IMG_PATH
-from cv2img import CV2Img
-from finder.multiscale_template_matcher import MultiScaleTemplateMatcher
-from finder.template_finder import TemplateFinder
+from pysikuli import TemplateFinder
+from pysikuli.cv2img import CV2Img
+from pysikuli.multiscale_template_matcher import MultiScaleTemplateMatcher
+from .config import IMG_PATH
 
 size_list = np.arange(0.7, 1, 0.01)
 error = 10 #px

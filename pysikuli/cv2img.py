@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import base64
-from rectangle import Rectangle
+from .rectangle import Rectangle
 
 class CV2Img:
     def __init__(self, source=None):
